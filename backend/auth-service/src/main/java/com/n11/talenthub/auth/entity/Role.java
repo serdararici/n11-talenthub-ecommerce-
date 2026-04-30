@@ -1,0 +1,6 @@
+package com.n11.talenthub.auth.entity;
+
+public enum Role {
+    ROLE_USER,
+    ROLE_ADMIN
+}
