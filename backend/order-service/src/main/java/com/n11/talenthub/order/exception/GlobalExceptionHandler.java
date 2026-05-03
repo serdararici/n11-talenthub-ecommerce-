@@ -1,6 +1,7 @@
 package com.n11.talenthub.order.exception;
 
 import com.n11.talenthub.order.dto.ApiResponse;
+import com.n11.talenthub.order.dto.PaymentResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +42,27 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleAccessDenied(AccessDeniedException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
                 .body(ApiResponse.error("Access denied: insufficient permissions"));
+    }
+
+    @ExceptionHandler(PaymentException.class)
+    public ResponseEntity<ApiResponse<PaymentResponse>> handlePayment(PaymentException ex) {
+        PaymentResponse body = PaymentResponse.builder()
+                .success(false)
+                .errorMessage(ex.getMessage())
+                .errorCode(ex.getErrorCode())
+                .build();
+        return ResponseEntity.status(HttpStatus.PAYMENT_REQUIRED)
+                .body(ApiResponse.<PaymentResponse>builder()
+                        .success(false)
+                        .message(ex.getMessage())
+                        .data(body)
+                        .timestamp(LocalDateTime.now().toString())
+                        .build());
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ApiResponse<Void>> handleIllegalState(IllegalStateException ex) {
+        return ResponseEntity.badRequest().body(ApiResponse.error(ex.getMessage()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

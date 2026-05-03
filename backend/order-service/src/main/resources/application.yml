@@ -24,6 +24,11 @@ spring:
 jwt:
   secret: ${JWT_SECRET:n11-talenthub-super-secret-key-minimum-256-bits-hs256-algorithm-dev-only}
 
+iyzico:
+  api-key: ${IYZICO_API_KEY:sandbox-KJnCTqm8kUApYXrKEILsGZ6YECl}
+  secret-key: ${IYZICO_SECRET_KEY:sandbox-VgVs3HQKC4QHVBEX4eMFeTGIbgHtbBZl}
+  base-url: ${IYZICO_BASE_URL:https://sandbox-api.iyzipay.com}
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html

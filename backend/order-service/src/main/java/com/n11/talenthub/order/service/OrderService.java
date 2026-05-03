@@ -1,5 +1,6 @@
 package com.n11.talenthub.order.service;
 
+import com.iyzipay.model.Payment;
 import com.n11.talenthub.order.dto.*;
 import com.n11.talenthub.order.entity.Order;
 import com.n11.talenthub.order.entity.OrderItem;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 public class OrderService {
 
     private final OrderRepository orderRepository;
+    private final IyzicoService iyzicoService;
 
     public OrderResponse createOrder(OrderPrincipal principal, CreateOrderRequest request) {
         BigDecimal totalAmount = request.getItems().stream()
@@ -94,6 +96,34 @@ public class OrderService {
         return toResponse(saved);
     }
 
+    public PaymentResponse processPayment(Long orderId, OrderPrincipal principal,
+                                          PaymentRequest paymentRequest, String buyerIp) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(orderId));
+
+        if (!order.getUserId().equals(principal.userId())) {
+            throw new AccessDeniedException("Not your order");
+        }
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new IllegalStateException(
+                    "Payment is only allowed for PENDING orders. Current status: " + order.getStatus());
+        }
+
+        Payment payment = iyzicoService.charge(order, paymentRequest, buyerIp);
+
+        order.setStatus(OrderStatus.CONFIRMED);
+        order.setPaymentId(payment.getPaymentId());
+        Order saved = orderRepository.save(order);
+        log.info("Payment confirmed: orderId={}, iyzicoPaymentId={}", orderId, payment.getPaymentId());
+
+        return PaymentResponse.builder()
+                .success(true)
+                .paymentId(payment.getPaymentId())
+                .conversationId(payment.getConversationId())
+                .order(toResponse(saved))
+                .build();
+    }
+
     private OrderResponse toResponse(Order order) {
         List<OrderItemResponse> items = order.getItems().stream()
                 .map(i -> OrderItemResponse.builder()
@@ -115,6 +145,7 @@ public class OrderService {
                 .status(order.getStatus())
                 .totalAmount(order.getTotalAmount())
                 .paymentMethod(order.getPaymentMethod())
+                .paymentId(order.getPaymentId())
                 .items(items)
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())

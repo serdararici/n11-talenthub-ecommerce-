@@ -42,6 +42,8 @@ public class Order {
 
     private String paymentMethod;
 
+    private String paymentId;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @Builder.Default
     private List<OrderItem> items = new ArrayList<>();

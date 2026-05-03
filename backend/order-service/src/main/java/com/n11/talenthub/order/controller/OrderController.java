@@ -6,6 +6,7 @@ import com.n11.talenthub.order.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -62,5 +63,25 @@ public class OrderController {
             @Valid @RequestBody UpdateStatusRequest request) {
         OrderResponse order = orderService.updateStatus(id, request.getStatus());
         return ResponseEntity.ok(ApiResponse.success(order, "Order status updated"));
+    }
+
+    @PostMapping("/{id}/payment")
+    @Operation(summary = "Pay for a PENDING order via Iyzico (sandbox)")
+    public ResponseEntity<ApiResponse<PaymentResponse>> processPayment(
+            @AuthenticationPrincipal OrderPrincipal principal,
+            @PathVariable Long id,
+            @Valid @RequestBody PaymentRequest request,
+            HttpServletRequest httpRequest) {
+        String buyerIp = resolveClientIp(httpRequest);
+        PaymentResponse response = orderService.processPayment(id, principal, request, buyerIp);
+        return ResponseEntity.ok(ApiResponse.success(response, "Payment processed successfully"));
+    }
+
+    private String resolveClientIp(HttpServletRequest request) {
+        String forwarded = request.getHeader("X-Forwarded-For");
+        if (forwarded != null && !forwarded.isBlank()) {
+            return forwarded.split(",")[0].trim();
+        }
+        return request.getRemoteAddr();
     }
 }
