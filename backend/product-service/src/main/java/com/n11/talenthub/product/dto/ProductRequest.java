@@ -16,11 +16,15 @@ public class ProductRequest {
     @Size(max = 255, message = "Product name must not exceed 255 characters")
     private String name;
 
+    private String brand;
+
     private String description;
 
     @NotNull(message = "Price is required")
     @DecimalMin(value = "0.01", message = "Price must be greater than 0")
     private BigDecimal price;
+
+    private BigDecimal originalPrice;
 
     @NotNull(message = "Stock quantity is required")
     @Min(value = 0, message = "Stock quantity cannot be negative")
@@ -30,4 +34,12 @@ public class ProductRequest {
     private String category;
 
     private String imageUrl;
+
+    private String badge;
+
+    private boolean freeShipping;
+
+    private Double rating;
+
+    private Integer reviewCount;
 }

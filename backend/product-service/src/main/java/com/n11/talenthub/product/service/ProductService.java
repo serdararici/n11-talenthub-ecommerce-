@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +27,7 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public PageResponse<ProductResponse> getProducts(int page, int size, String category, String search) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Pageable pageable = PageRequest.of(page, size);
         String categoryFilter = (category != null && !category.isBlank()) ? category : null;
         String searchFilter = (search != null && !search.isBlank()) ? search : null;
         Page<Product> productPage = productRepository.findByFilters(categoryFilter, searchFilter, pageable);
@@ -45,11 +44,17 @@ public class ProductService {
     public ProductResponse createProduct(ProductRequest request) {
         Product product = Product.builder()
                 .name(request.getName())
+                .brand(request.getBrand())
                 .description(request.getDescription())
                 .price(request.getPrice())
+                .originalPrice(request.getOriginalPrice())
                 .stockQuantity(request.getStockQuantity())
                 .category(request.getCategory())
                 .imageUrl(request.getImageUrl())
+                .badge(request.getBadge())
+                .freeShipping(request.isFreeShipping())
+                .rating(request.getRating())
+                .reviewCount(request.getReviewCount())
                 .build();
         product = productRepository.save(product);
         log.info("Product created: id={}, name={}", product.getId(), product.getName());
@@ -60,11 +65,17 @@ public class ProductService {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + id));
         product.setName(request.getName());
+        product.setBrand(request.getBrand());
         product.setDescription(request.getDescription());
         product.setPrice(request.getPrice());
+        product.setOriginalPrice(request.getOriginalPrice());
         product.setStockQuantity(request.getStockQuantity());
         product.setCategory(request.getCategory());
         product.setImageUrl(request.getImageUrl());
+        product.setBadge(request.getBadge());
+        product.setFreeShipping(request.isFreeShipping());
+        product.setRating(request.getRating());
+        product.setReviewCount(request.getReviewCount());
         product = productRepository.save(product);
         log.info("Product updated: id={}", product.getId());
         return toResponse(product);
@@ -101,11 +112,17 @@ public class ProductService {
         return ProductResponse.builder()
                 .id(product.getId())
                 .name(product.getName())
+                .brand(product.getBrand())
                 .description(product.getDescription())
                 .price(product.getPrice())
+                .originalPrice(product.getOriginalPrice())
                 .stockQuantity(product.getStockQuantity())
                 .category(product.getCategory())
                 .imageUrl(product.getImageUrl())
+                .badge(product.getBadge())
+                .freeShipping(product.isFreeShipping())
+                .rating(product.getRating())
+                .reviewCount(product.getReviewCount())
                 .active(product.isActive())
                 .createdAt(product.getCreatedAt())
                 .updatedAt(product.getUpdatedAt())

@@ -26,6 +26,14 @@ jwt:
   access-token-expiration: ${JWT_ACCESS_EXPIRATION:900000}
   refresh-token-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
 
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+
 management:
   endpoints:
     web:

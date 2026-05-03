@@ -16,14 +16,24 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findByIdAndActiveTrue(Long id);
 
-    @Query("""
-            SELECT p FROM Product p
-            WHERE p.active = true
-              AND (:category IS NULL OR p.category = :category)
-              AND (:search IS NULL
-                   OR LOWER(p.name) LIKE LOWER(CONCAT('%', :search, '%'))
-                   OR LOWER(p.description) LIKE LOWER(CONCAT('%', :search, '%')))
-            """)
+    @Query(value = """
+            SELECT * FROM products
+            WHERE active = true
+              AND (CAST(:category AS text) IS NULL OR category = CAST(:category AS text))
+              AND (CAST(:search AS text) IS NULL
+                   OR LOWER(name) LIKE LOWER('%' || CAST(:search AS text) || '%')
+                   OR LOWER(description) LIKE LOWER('%' || CAST(:search AS text) || '%'))
+            ORDER BY created_at DESC
+            """,
+            countQuery = """
+            SELECT COUNT(*) FROM products
+            WHERE active = true
+              AND (CAST(:category AS text) IS NULL OR category = CAST(:category AS text))
+              AND (CAST(:search AS text) IS NULL
+                   OR LOWER(name) LIKE LOWER('%' || CAST(:search AS text) || '%')
+                   OR LOWER(description) LIKE LOWER('%' || CAST(:search AS text) || '%'))
+            """,
+            nativeQuery = true)
     Page<Product> findByFilters(
             @Param("category") String category,
             @Param("search") String search,

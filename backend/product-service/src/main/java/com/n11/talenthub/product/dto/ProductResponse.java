@@ -16,11 +16,17 @@ public class ProductResponse {
 
     private Long id;
     private String name;
+    private String brand;
     private String description;
     private BigDecimal price;
+    private BigDecimal originalPrice;
     private Integer stockQuantity;
     private String category;
     private String imageUrl;
+    private String badge;
+    private boolean freeShipping;
+    private Double rating;
+    private Integer reviewCount;
     private boolean active;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -10,7 +10,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./backend/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
@@ -82,24 +82,18 @@ services:
     restart: on-failure
 
   cart-service:
-    profiles: ["full"]
     build:
       context: ./backend
       dockerfile: cart-service/Dockerfile
     container_name: ecommerce-cart
     env_file: .env
     environment:
-      DB_URL: jdbc:postgresql://postgres:5432/cart_db
-      DB_USERNAME: ${POSTGRES_USER}
-      DB_PASSWORD: ${POSTGRES_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       REDIS_HOST: redis
       REDIS_PORT: 6379
     ports:
       - "8083:8083"
     depends_on:
-      postgres:
-        condition: service_healthy
       redis:
         condition: service_healthy
     networks:
@@ -107,7 +101,6 @@ services:
     restart: on-failure
 
   order-service:
-    profiles: ["full"]
     build:
       context: ./backend
       dockerfile: order-service/Dockerfile

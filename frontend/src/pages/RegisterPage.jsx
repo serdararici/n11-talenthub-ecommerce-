@@ -23,7 +23,7 @@ export default function RegisterPage() {
     if (!form.email.trim())                            e.email           = 'E-posta gerekli';
     else if (!/\S+@\S+\.\S+/.test(form.email))        e.email           = 'Geçerli bir e-posta girin';
     if (!form.password)                                e.password        = 'Şifre gerekli';
-    else if (form.password.length < 6)                 e.password        = 'Şifre en az 6 karakter olmalı';
+    else if (form.password.length < 8)                 e.password        = 'Şifre en az 8 karakter olmalı';
     if (!form.confirmPassword)                         e.confirmPassword = 'Şifreyi tekrar girin';
     else if (form.confirmPassword !== form.password)   e.confirmPassword = 'Şifreler eşleşmiyor';
     return e;

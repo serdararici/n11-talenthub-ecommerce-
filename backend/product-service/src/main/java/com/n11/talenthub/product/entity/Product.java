@@ -24,11 +24,16 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
+    private String brand;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal originalPrice;
 
     @Column(nullable = false)
     private Integer stockQuantity;
@@ -37,6 +42,16 @@ public class Product {
     private String category;
 
     private String imageUrl;
+
+    private String badge;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean freeShipping = false;
+
+    private Double rating;
+
+    private Integer reviewCount;
 
     @Column(nullable = false)
     @Builder.Default
