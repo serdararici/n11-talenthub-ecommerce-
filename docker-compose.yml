@@ -123,6 +123,21 @@ services:
       - ecommerce-network
     restart: on-failure
 
+  frontend:
+    build:
+      context: ./frontend
+    container_name: ecommerce-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - auth-service
+      - product-service
+      - cart-service
+      - order-service
+    networks:
+      - ecommerce-network
+    restart: on-failure
+
 # ─── Volumes & Networks ──────────────────────────────────────────────────────
 
 volumes:
