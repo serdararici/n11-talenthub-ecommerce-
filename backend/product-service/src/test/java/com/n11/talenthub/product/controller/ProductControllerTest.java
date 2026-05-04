@@ -3,6 +3,7 @@ package com.n11.talenthub.product.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.n11.talenthub.product.config.SecurityConfig;
 import com.n11.talenthub.product.dto.PageResponse;
+import com.n11.talenthub.product.security.JwtAuthFilter;
 import com.n11.talenthub.product.dto.ProductRequest;
 import com.n11.talenthub.product.dto.ProductResponse;
 import com.n11.talenthub.product.exception.ProductNotFoundException;
@@ -48,6 +49,7 @@ class ProductControllerTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private ObjectMapper objectMapper;
     @MockBean private ProductService productService;
+    @MockBean private JwtAuthFilter jwtAuthFilter;
 
     @TestConfiguration
     @EnableMethodSecurity
