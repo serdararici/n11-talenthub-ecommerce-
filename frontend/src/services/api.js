@@ -17,6 +17,15 @@ function createInstance(baseURL) {
     res => res.data.data,
     err => {
       if (err.response) {
+        if (err.response.status === 401) {
+          localStorage.removeItem('n11_token');
+          localStorage.removeItem('n11_user');
+          localStorage.removeItem('n11_refresh_token');
+          if (!window.location.pathname.startsWith('/login')) {
+            window.location.href = '/login';
+          }
+          return Promise.reject(new Error('Oturumunuz sona erdi. Lütfen tekrar giriş yapın.'));
+        }
         const msg = err.response.data?.message || 'Bir hata oluştu';
         return Promise.reject(new Error(msg));
       }
@@ -86,7 +95,8 @@ export const cartRemove = productId                 => cartApi.delete(`/api/cart
 export const cartClear  = ()                        => cartApi.delete('/api/cart');
 
 // ── Orders ───────────────────────────────────────────────────────────────
-export const orderCreate      = data => orderApi.post('/api/orders', data);
-export const orderList        = ()   => orderApi.get('/api/orders');
-export const orderGet         = id   => orderApi.get(`/api/orders/${id}`);
-export const orderUpdateStatus= (id, status) => orderApi.put(`/api/orders/${id}/status`, { status });
+export const orderCreate      = data        => orderApi.post('/api/orders', data);
+export const orderList        = ()          => orderApi.get('/api/orders');
+export const orderGet         = id          => orderApi.get(`/api/orders/${id}`);
+export const orderUpdateStatus= (id, status)=> orderApi.put(`/api/orders/${id}/status`, { status });
+export const orderPayment     = (id, data)  => orderApi.post(`/api/orders/${id}/payment`, data);

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
-import { orderCreate } from '../services/api';
+import { orderCreate, orderPayment } from '../services/api';
 
 const FREE_SHIPPING_THRESHOLD = 500;
 
@@ -59,20 +59,42 @@ export default function CheckoutPage() {
   const handlePlaceOrder = async () => {
     setSubmitting(true);
     setError('');
+    const shippingAddress = `${addrForm.address}, ${addrForm.city}${addrForm.postalCode ? ' ' + addrForm.postalCode : ''}`;
     const payload = {
-      shippingAddress: `${addrForm.address}, ${addrForm.city}${addrForm.postalCode ? ' ' + addrForm.postalCode : ''}`,
-      items: items.map(i => ({ productId: i.productId, quantity: i.quantity, price: i.product?.price })),
+      shippingAddress,
+      items: items.map(i => ({
+        productId:   i.productId,
+        productName: i.product?.name || i.productName || 'Ürün',
+        brand:       i.product?.brand || i.brand || '',
+        quantity:    i.quantity,
+        price:       i.product?.price || i.price,
+      })),
       paymentMethod: payMethod,
       totalAmount: grandTotal,
     };
     try {
       const result = await orderCreate(payload);
-      setOrderId(result?.id || result?.orderId || 'ORD-' + Date.now());
+      const createdOrderId = result?.id;
+
+      if (payMethod === 'card' && createdOrderId) {
+        const [month, year] = cardForm.expiry.split('/');
+        await orderPayment(createdOrderId, {
+          cardHolderName: cardForm.holder,
+          cardNumber:     cardForm.number.replace(/\s/g, ''),
+          expireMonth:    (month || '').padStart(2, '0'),
+          expireYear:     (year || '').length === 2 ? '20' + year : (year || ''),
+          cvc:            cardForm.cvv,
+          buyerFirstName: addrForm.firstName,
+          buyerLastName:  addrForm.lastName,
+          buyerPhone:     addrForm.phone,
+        });
+      }
+
+      setOrderId(createdOrderId || 'ORD-' + Date.now());
       clearCart();
       setStep(3);
     } catch (e) {
       if (e.message === '__NETWORK__' || e.message?.includes('Network') || e.message?.includes('NETWORK')) {
-        // order-service not yet running — simulate success in dev
         setOrderId('ORD-' + Date.now());
         clearCart();
         setStep(3);
