@@ -21,6 +21,7 @@
 ## 📋 Table of Contents
 
 - [Overview](#-overview)
+- [Screenshots](#-screenshots)
 - [Architecture](#-architecture)
 - [Tech Stack](#-tech-stack)
 - [Microservices](#-microservices)
@@ -48,6 +49,17 @@ This project is a fully functional e-commerce application developed as the final
 - **Payment Integration** — Iyzico payment gateway (sandbox)
 - **API Documentation** — Swagger/OpenAPI 3 for all services
 - **Clean Code & SOLID** — DTOs, global exception handling, layered architecture
+
+## 📸 Screenshots
+
+#### Home Page
+![Home Page](https://github.com/serdararici/n11-talenthub-ecommerce-/blob/main/screenshots/HomePage.JPG)
+#### Product Listing
+![Product Listing](https://github.com/serdararici/n11-talenthub-ecommerce-/blob/main/screenshots/ProductList.JPG)
+#### Product Details
+![Product Details](https://github.com/serdararici/n11-talenthub-ecommerce-/blob/main/screenshots/ProductDetails.JPG)
+#### Cart
+![Cart](https://github.com/serdararici/n11-talenthub-ecommerce-/blob/main/screenshots/Cart.JPG)
 
 ### Features
 
